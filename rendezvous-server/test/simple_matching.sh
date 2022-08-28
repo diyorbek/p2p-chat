@@ -13,7 +13,7 @@ delete_file(){
 delete_file 1.txt
 delete_file 2.txt
 
-$curr_dir/../build/chat-server  &
+$curr_dir/../../build/rendezvous-server/rendezvous  &
 sleep 1
 
 echo Peer1 room-1 | nc -p 12345 -u 0.0.0.0 8081 >> 1.txt &

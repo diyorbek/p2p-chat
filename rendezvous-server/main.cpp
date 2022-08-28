@@ -1,59 +1,19 @@
-#include <boost/algorithm/string.hpp>
-#include <boost/array.hpp>
 #include <boost/asio.hpp>
-#include <boost/bind.hpp>
-#include <boost/smart_ptr.hpp>
-#include <boost/thread.hpp>
-#include <condition_variable>
-#include <cstdlib>
 #include <iostream>
 #include <map>
-#include <mutex>
 #include <unordered_map>
-#include <vector>
+
+#include "./peer.h"
 
 using boost::asio::ip::udp;
 using namespace std;
 
 const int max_length = 1024;
 
-struct peer {
-  udp::endpoint remote_endpoint;
-  string ip;
-  u_short port;
-  string name;
-  string room_name;
-};
-
 typedef unordered_map<string, peer> room_hosts;
 typedef map<pair<string, u_short>, string> Sessions;
 room_hosts hosts;
 Sessions sessions;
-
-peer parse_request(udp::endpoint& remote_endpoint, string& raw_request) {
-  auto address = remote_endpoint.address().to_string();
-  auto port = remote_endpoint.port();
-  boost::trim(raw_request);
-  vector<string> request;
-  boost::split(request, raw_request, boost::is_any_of(" "));
-
-  if (request.size() != 2) {
-    throw std::runtime_error(to_string(port) + " sent invalid request\n");
-  }
-
-  peer peer;
-  peer.remote_endpoint = remote_endpoint;
-  peer.ip = address;
-  peer.port = port;
-  peer.name = request[0];
-  peer.room_name = request[1];
-
-  return peer;
-}
-
-string serialize_peer_info(peer peer) {
-  return peer.name + ' ' + peer.ip + ' ' + to_string(peer.port) + '\n';
-}
 
 void handle_request(udp::socket& socket,
                     udp::endpoint remote_endpoint,
@@ -65,7 +25,7 @@ void handle_request(udp::socket& socket,
     return;
   }
 
-  peer new_peer = parse_request(remote_endpoint, raw_request);
+  auto new_peer = peer::deserilize(remote_endpoint, raw_request);
   auto room_name = new_peer.room_name;
 
   sessions.insert({{address, port}, room_name});
@@ -78,8 +38,8 @@ void handle_request(udp::socket& socket,
 
   auto peer1 = hosts[room_name];
   auto peer2 = new_peer;
-  auto peer1_data = serialize_peer_info(peer1);
-  auto peer2_data = serialize_peer_info(peer2);
+  auto peer1_data = peer1.serialize();
+  auto peer2_data = peer2.serialize();
 
   socket.send_to(boost::asio::buffer(peer2_data), peer1.remote_endpoint);
   socket.send_to(boost::asio::buffer(peer1_data), peer2.remote_endpoint);
