@@ -1,5 +1,6 @@
 #include <boost/asio.hpp>
 #include <iostream>
+#include <sstream>
 
 #include "peer.h"
 #include "server.h"
@@ -11,22 +12,38 @@ server::server(boost::asio::io_service& io_service, short port)
 
 void server::start() {
   while (true) {
-    char data[max_buffer_size];
-    udp::endpoint remote_endpoint;
-    boost::system::error_code error;
+    auto received = receive();
 
-    size_t length = socket.receive_from(
-        boost::asio::buffer(data, max_buffer_size), remote_endpoint, 0, error);
-
-    if (error && error != boost::asio::error::message_size)
-      std::cerr << "Exception: " << error.what() << "\n";
-
-    handle_request(remote_endpoint, std::string(data, length));
+    try {
+      handle_request(received);
+    } catch (std::exception& e) {
+      std::cerr << "Failed to handle request: " << e.what() << "\n";
+    }
   }
 }
 
-void server::handle_request(udp::endpoint remote_endpoint,
-                            std::string raw_request) {
+received server::receive() {
+  char data[max_buffer_size];
+  udp::endpoint remote_endpoint;
+  boost::system::error_code error;
+
+  size_t length = socket.receive_from(
+      boost::asio::buffer(data, max_buffer_size), remote_endpoint, 0, error);
+
+  if (error && error != boost::asio::error::message_size)
+    throw std::runtime_error("Exception while receiving: " + error.what());
+
+  std::stringstream request_stream(std::string(data, length));
+  request req;
+
+  req.deserialize(data, length);
+
+  return {remote_endpoint, req};
+}
+
+void server::handle_request(received received) {
+  auto remote_endpoint = received.remote_endpoint;
+  auto request = received.request;
   auto address = remote_endpoint.address().to_string();
   auto port = remote_endpoint.port();
 
@@ -34,7 +51,8 @@ void server::handle_request(udp::endpoint remote_endpoint,
     return;
   }
 
-  auto new_peer = peer::deserilize(remote_endpoint, raw_request);
+  auto new_peer = peer::deserilize(
+      remote_endpoint, std::string(request.content, request.length));
   auto room_name = new_peer.room_name;
 
   sessions.insert({{address, port}, room_name});

@@ -1,7 +1,5 @@
 #include <boost/asio.hpp>
 #include <iostream>
-#include <map>
-#include <unordered_map>
 
 #include "peer.h"
 #include "server.h"

@@ -3,12 +3,19 @@
 #include <unordered_map>
 #include <vector>
 
+#include "../shared/request.h"
+
 using boost::asio::ip::udp;
 
 typedef std::unordered_map<std::string, peer> room_hosts;
 
 // using `map`instead of `unordered_map` because it supports `std::pair` as key
 typedef std::map<std::pair<std::string, u_short>, std::string> Sessions;
+
+struct received {
+  udp::endpoint remote_endpoint;
+  request request;
+};
 
 class server {
   udp::socket socket;
@@ -20,6 +27,6 @@ class server {
   server(boost::asio::io_service& io_service, short port);
 
   void start();
-
-  void handle_request(udp::endpoint remote_endpoint, std::string raw_request);
+  received receive();
+  void handle_request(received received);
 };

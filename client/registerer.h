@@ -7,7 +7,6 @@
 
 struct register_request {
   std::string name;
-  unsigned short port;
   std::string room_name;
 
   std::string serialize() {

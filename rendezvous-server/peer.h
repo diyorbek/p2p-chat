@@ -18,8 +18,7 @@ struct peer {
     return name + ' ' + ip + ' ' + std::to_string(port) + '\n';
   }
 
-  static peer deserilize(udp::endpoint& remote_endpoint,
-                         std::string& raw_data) {
+  static peer deserilize(udp::endpoint& remote_endpoint, std::string raw_data) {
     auto address = remote_endpoint.address().to_string();
     auto port = remote_endpoint.port();
 
@@ -28,7 +27,7 @@ struct peer {
     boost::split(data, raw_data, boost::is_any_of(" "));
 
     if (data.size() != 2)
-      throw std::runtime_error(std::to_string(port) + " sent invalid data\n");
+      throw std::runtime_error(std::to_string(port) + " sent invalid data");
 
     peer peer;
     peer.remote_endpoint = remote_endpoint;

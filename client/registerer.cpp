@@ -5,6 +5,7 @@
 #include <iostream>
 #include <vector>
 
+#include "../shared/request.h"
 #include "client.h"
 #include "peer_info.h"
 #include "registerer.h"
@@ -18,14 +19,20 @@ using boost::asio::ip::udp;
 
 enum { max_length = 1024 };
 
-peer_info client::registerer(register_request request) {
+peer_info client::registerer(register_request register_request) {
   try {
     udp::endpoint register_endpoint(address::from_string(REGISTERER_SERVER_IP),
                                     REGISTERER_SERVER_PORT);
     boost::system::error_code error;
-    auto serialized = request.serialize();
+    auto serialized = register_request.serialize();
 
-    socket.send_to(boost::asio::buffer(serialized), register_endpoint);
+    request request;
+    request.type = PSH;
+    request.put_content(serialized);
+    auto data = request.serialize();
+
+    socket.send_to(boost::asio::buffer(data.first, data.second),
+                   register_endpoint);
 
     std::cout << "Checked in with server. Waiting for peer to connect..."
               << std::endl;
