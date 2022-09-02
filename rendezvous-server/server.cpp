@@ -43,15 +43,17 @@ received server::receive() {
 
 void server::send_receive_ack(udp::endpoint remote_endpoint) {
   request ack_response(ACK);
-  auto ack_data = ack_response.serialize();
+  send_to(remote_endpoint, ack_response);
+}
 
-  socket.send_to(boost::asio::buffer(ack_data.first, ack_data.second),
-                 remote_endpoint);
+void server::send_to(udp::endpoint remote_endpoint, request request) {
+  auto data = request.serialize();
+  socket.send_to(boost::asio::buffer(data.first, data.second), remote_endpoint);
 }
 
 void server::handle_request(received received) {
   auto remote_endpoint = received.remote_endpoint;
-  auto request = received.request;
+  auto received_request = received.request;
   auto address = remote_endpoint.address().to_string();
   auto port = remote_endpoint.port();
 
@@ -59,7 +61,8 @@ void server::handle_request(received received) {
     return;
   }
 
-  auto new_peer = peer::deserilize(remote_endpoint, request.get_content());
+  auto new_peer =
+      peer::deserilize(remote_endpoint, received_request.get_content());
   auto room_name = new_peer.room_name;
 
   sessions.insert({{address, port}, room_name});
@@ -72,11 +75,11 @@ void server::handle_request(received received) {
 
   auto peer1 = hosts[room_name];
   auto peer2 = new_peer;
-  auto peer1_data = peer1.serialize();
-  auto peer2_data = peer2.serialize();
+  request peer1_data(PSH, peer1.serialize());
+  request peer2_data(PSH, peer2.serialize());
 
-  socket.send_to(boost::asio::buffer(peer2_data), peer1.remote_endpoint);
-  socket.send_to(boost::asio::buffer(peer1_data), peer2.remote_endpoint);
+  send_to(peer1.remote_endpoint, peer2_data);
+  send_to(peer2.remote_endpoint, peer1_data);
 
   sessions.erase({peer1.ip, peer1.port});
   sessions.erase({peer2.ip, peer2.port});

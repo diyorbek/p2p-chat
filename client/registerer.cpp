@@ -10,7 +10,7 @@
 #include "peer_info.h"
 #include "registerer.h"
 
-#define REGISTERER_SERVER_IP "0.0.0.0"  // "46.101.118.227"
+#define REGISTERER_SERVER_IP "0.0.0.0"
 #define REGISTERER_SERVER_PORT 8081
 
 using boost::asio::ip::address;
@@ -32,29 +32,31 @@ peer_info client::registerer(register_request register_request) {
     socket.send_to(boost::asio::buffer(data.first, data.second),
                    register_endpoint);
 
-    char buf[max_length];
-    size_t length = socket.receive_from(boost::asio::buffer(buf, max_length),
-                                        register_endpoint, 0, error);
+    auto ack_res = receive_from(register_endpoint, error);
 
-    request res;
-    res.deserialize(buf, length);
-
-    if (res.get_type() != ACK)
+    if (ack_res.get_type() != ACK)
       throw std::runtime_error("Couldn't check in with server.");
 
     std::cout << "Checked in with server. Waiting for peer to connect..."
               << std::endl;
 
-    char streambuf[1024];
-    socket.receive_from(boost::asio::buffer(streambuf), register_endpoint, 0,
-                        error);
+    auto peer_data = receive_from(register_endpoint, error);
 
-    std::ostringstream ss;
-    ss << streambuf;
-
-    return peer_info::deserilize(ss.str());
+    return peer_info::deserilize(peer_data.get_content());
   } catch (std::exception& e) {
     std::cerr << e.what() << std::endl;
     return {};
   }
+}
+
+request client::receive_from(udp::endpoint remote_endpoint,
+                             boost::system::error_code& error) {
+  char buffer[max_length];
+  auto length = socket.receive_from(boost::asio::buffer(buffer, max_length),
+                                    remote_endpoint, 0, error);
+
+  request data;
+  data.deserialize(buffer, length);
+
+  return data;
 }

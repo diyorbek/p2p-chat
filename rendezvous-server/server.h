@@ -28,6 +28,7 @@ class server {
 
   void start();
   received receive();
+  void send_to(udp::endpoint remote_endpoint, request request);
   void send_receive_ack(udp::endpoint remote_endpoint);
   void handle_request(received received);
 };
