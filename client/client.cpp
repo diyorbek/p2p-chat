@@ -17,8 +17,6 @@ client::client(io_service& io_service)
     : io_svc(io_service), socket(io_service, udp::endpoint(udp::v4(), 0)) {}
 
 void client::connect(peer_info& peer) {
-  std::cout << "\nPeer found: " << peer.raw << std::flush << "\n\n";
-
   auto ip_address = address::from_string(peer.ip);
   udp::endpoint peer_endpoint(ip_address, stoi(peer.port));
 

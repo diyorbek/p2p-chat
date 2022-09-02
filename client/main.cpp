@@ -8,6 +8,8 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
+  bool is_debug_mode = argc > 1 && strcmp(argv[1], "-d") == 0;
+
   try {
     boost::asio::io_service io_service;
     client client(io_service);
@@ -20,9 +22,12 @@ int main(int argc, char* argv[]) {
 
     auto peer = client.registerer(request);
 
-    client.connect(peer);
-  } catch (std::exception& e) {
-    std::cerr << "Exception: " << e.what() << "\n";
+    cout << "\nPeer found: " << peer.raw << flush << "\n\n";
+
+    if (!is_debug_mode)
+      client.connect(peer);
+  } catch (exception& e) {
+    cerr << "Exception: " << e.what() << "\n";
   }
 
   return 0;
