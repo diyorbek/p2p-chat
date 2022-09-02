@@ -33,12 +33,20 @@ received server::receive() {
   if (error && error != boost::asio::error::message_size)
     throw std::runtime_error("Exception while receiving: " + error.what());
 
-  std::stringstream request_stream(std::string(data, length));
-  request req;
+  send_receive_ack(remote_endpoint);
 
+  request req;
   req.deserialize(data, length);
 
   return {remote_endpoint, req};
+}
+
+void server::send_receive_ack(udp::endpoint remote_endpoint) {
+  request ack_response(ACK);
+  auto ack_data = ack_response.serialize();
+
+  socket.send_to(boost::asio::buffer(ack_data.first, ack_data.second),
+                 remote_endpoint);
 }
 
 void server::handle_request(received received) {
@@ -51,9 +59,7 @@ void server::handle_request(received received) {
     return;
   }
 
-  std::string request_content(request.get_content(),
-                              request.get_content_length());
-  auto new_peer = peer::deserilize(remote_endpoint, request_content);
+  auto new_peer = peer::deserilize(remote_endpoint, request.get_content());
   auto room_name = new_peer.room_name;
 
   sessions.insert({{address, port}, room_name});

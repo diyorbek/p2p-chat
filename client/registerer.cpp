@@ -26,11 +26,21 @@ peer_info client::registerer(register_request register_request) {
     boost::system::error_code error;
     auto serialized = register_request.serialize();
 
-    request request(PSH, serialized);
-    auto data = request.serialize();
+    request register_request(PSH, serialized);
+    auto data = register_request.serialize();
 
     socket.send_to(boost::asio::buffer(data.first, data.second),
                    register_endpoint);
+
+    char buf[max_length];
+    size_t length = socket.receive_from(boost::asio::buffer(buf, max_length),
+                                        register_endpoint, 0, error);
+
+    request res;
+    res.deserialize(buf, length);
+
+    if (res.get_type() != ACK)
+      throw std::runtime_error("Couldn't check in with server.");
 
     std::cout << "Checked in with server. Waiting for peer to connect..."
               << std::endl;

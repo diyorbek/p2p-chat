@@ -37,7 +37,7 @@ Peer4"
 rm 1.txt
 
 # echo $expected
-# echo $actual
+echo $actual
 
 if [ "$expected" == "$actual" ]; then
   echo -e "\033[32msuccess"
