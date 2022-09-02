@@ -26,9 +26,7 @@ peer_info client::registerer(register_request register_request) {
     boost::system::error_code error;
     auto serialized = register_request.serialize();
 
-    request request;
-    request.type = PSH;
-    request.put_content(serialized);
+    request request(PSH, serialized);
     auto data = request.serialize();
 
     socket.send_to(boost::asio::buffer(data.first, data.second),

@@ -16,5 +16,5 @@ endif(Boost_FOUND)
 
 set(USED_LIBS ${Boost_SYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY})
 
-add_executable(rendezvous main.cpp server.cpp)
+add_executable(rendezvous main.cpp server.cpp ../shared/request.cpp)
 target_link_libraries(rendezvous ${USED_LIBS})

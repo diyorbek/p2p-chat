@@ -51,8 +51,9 @@ void server::handle_request(received received) {
     return;
   }
 
-  auto new_peer = peer::deserilize(
-      remote_endpoint, std::string(request.content, request.length));
+  std::string request_content(request.get_content(),
+                              request.get_content_length());
+  auto new_peer = peer::deserilize(remote_endpoint, request_content);
   auto room_name = new_peer.room_name;
 
   sessions.insert({{address, port}, room_name});
