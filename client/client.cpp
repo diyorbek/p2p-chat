@@ -16,6 +16,9 @@ using boost::asio::ip::udp;
 client::client(io_service& io_service)
     : io_svc(io_service), socket(io_service, udp::endpoint(udp::v4(), 0)) {}
 
+client::client(io_service& io_service, u_short port)
+    : io_svc(io_service), socket(io_service, udp::endpoint(udp::v4(), port)) {}
+
 void client::connect(peer_info& peer) {
   auto ip_address = address::from_string(peer.ip);
   udp::endpoint peer_endpoint(ip_address, stoi(peer.port));

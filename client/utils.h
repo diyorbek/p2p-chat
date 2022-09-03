@@ -8,31 +8,25 @@
 #include <iostream>
 #include <thread>
 
+#include "peer_info.h"
+
 namespace utils {
 
-int get_terminal_char_width() {
-  struct winsize w;
-  ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-  return w.ws_col;
-}
+int get_terminal_char_width();
 
-void print_received_message(peer_info& peer, std::string& message) {
-  std::string cleaner(utils::get_terminal_char_width(), ' ');
-  std::cout << '\r' << cleaner;
-  std::cout << '\r' << (peer.name + ": " + message) << '\n';
-  std::cout << "> " << std::flush;
-}
+void print_received_message(peer_info& peer, std::string& message);
 
-std::string input_message() {
-  std::string message;
-  std::cout << "\r> ";
-  std::getline(std::cin, message);
-  message += '\n';
-  return message;
-}
+std::string input_message();
 
-void print_sent_message(std::string& message) {
-  std::cout << "\033[F\r> " << message << std::flush;
-}
+void print_sent_message(std::string& message);
+
+struct cmd_options {
+  bool is_debug_mode;
+  u_short source_port;
+  bool has_known_peer;
+  peer_info known_peer;
+};
+
+cmd_options get_cmd_options(int argc, char* argv[]);
 
 }  // namespace utils

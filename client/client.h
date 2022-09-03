@@ -17,6 +17,7 @@ class client {
 
  public:
   client(boost::asio::io_service& io_service);
+  client(boost::asio::io_service& io_service, u_short port);
 
   peer_info registerer(register_request request);
   void connect(peer_info& peer);

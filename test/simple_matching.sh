@@ -18,21 +18,21 @@ delete_file 1.txt
 $rendezvous & sleep 1
 
 echo "Peer1
-room-1" | $client -d | grep Peer >> 1.txt &
+room-1" | $client -d -p 12345 | grep Peer >> 1.txt &
 echo "Peer2
-room-2" | $client -d | grep Peer >> 1.txt &
+room-2" | $client -d -p 23456 | grep Peer >> 1.txt &
 echo "Peer3
-room-1" | $client -d | grep Peer >> 1.txt &
+room-1" | $client -d -p 34567 | grep Peer >> 1.txt &
 echo "Peer4
-room-2" | $client -d | grep Peer >> 1.txt &
+room-2" | $client -d -p 45678 | grep Peer >> 1.txt &
 
 sleep 1
 
-actual=$(cat 1.txt | grep -oe 'Peer\d' | sort)
-expected="Peer1
-Peer2
-Peer3
-Peer4"
+actual=$(cat 1.txt | grep -oE 'Peer\d .+' | sort)
+expected="Peer1 127.0.0.1 12345
+Peer2 127.0.0.1 23456
+Peer3 127.0.0.1 34567
+Peer4 127.0.0.1 45678"
 
 rm 1.txt
 
