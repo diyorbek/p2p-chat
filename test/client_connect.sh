@@ -40,7 +40,7 @@ mkfifo in3
 tail -f in2 | $client -p 12345 -c Peer2 127.0.0.1 23456 >> 2.txt &
 tail -f in3 | $client -p 23456 -c Peer1 127.0.0.1 12345 >> 3.txt &
 
-sleep 0.5
+sleep 1
 
 send "Hey!" > in2
 send "Hi!" > in3

@@ -1,38 +1,38 @@
 #include <iostream>
 
-#include "request.h"
+#include "packet.h"
 
-u_short request::__seq_num = 0;
+u_short packet::__seq_num = 0;
 
-request::request() {}
+packet::packet() {}
 
-request::request(request_type type) : _type(type), _seq_num(++__seq_num) {}
+packet::packet(packet_type type) : _type(type), _seq_num(++__seq_num) {}
 
-request::request(request_type type, std::string str) : request(type) {
+packet::packet(packet_type type, std::string str) : packet(type) {
   put_content(str);
 }
 
-u_short request::get_seq_num() {
+u_short packet::get_seq_num() {
   return _seq_num;
 }
 
-request_type request::get_type() {
+packet_type packet::get_type() {
   return _type;
 }
 
-std::string request::get_content() {
+std::string packet::get_content() {
   return _content;
 }
 
-u_short request::get_content_length() {
+u_short packet::get_content_length() {
   return _content.length();
 }
 
-void request::put_content(std::string str) {
+void packet::put_content(std::string str) {
   _content = str;
 }
 
-std::pair<char*, size_t> request::serialize() const {
+std::pair<char*, size_t> packet::serialize() const {
   // calculate size including the actual length of the content
   u_short _length = _content.length();
   size_t size = sizeof(_type) + sizeof(_length) + _length + 1;
@@ -48,7 +48,7 @@ std::pair<char*, size_t> request::serialize() const {
   return {serialized, size};
 }
 
-void request::deserialize(char* serialized, size_t size) {
+void packet::deserialize(char* serialized, size_t size) {
   auto cursor = serialized;
 
   memcpy(&_type, cursor, sizeof(_type));

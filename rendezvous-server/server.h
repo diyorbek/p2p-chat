@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../shared/request.h"
+#include "../shared/packet.h"
 
 using boost::asio::ip::udp;
 
@@ -14,7 +14,7 @@ typedef std::map<std::pair<std::string, u_short>, std::string> Sessions;
 
 struct received {
   udp::endpoint remote_endpoint;
-  request request;
+  packet packet;
 };
 
 class server {
@@ -28,7 +28,7 @@ class server {
 
   void start();
   received receive();
-  void send_to(udp::endpoint remote_endpoint, request request);
+  void send_to(udp::endpoint remote_endpoint, packet packet);
   void send_receive_ack(udp::endpoint remote_endpoint);
   void handle_request(received received);
 };

@@ -15,5 +15,5 @@ endif(Boost_FOUND)
 
 set(USED_LIBS ${Boost_SYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY})
 
-add_executable(client main.cpp client.cpp registerer.cpp utils.cpp ../shared/request.cpp)
+add_executable(client main.cpp client.cpp registerer.cpp utils.cpp ../shared/packet.cpp)
 target_link_libraries(client ${USED_LIBS})

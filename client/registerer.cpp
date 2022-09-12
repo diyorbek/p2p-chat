@@ -5,7 +5,7 @@
 #include <iostream>
 #include <vector>
 
-#include "../shared/request.h"
+#include "../shared/packet.h"
 #include "client.h"
 #include "peer_info.h"
 #include "registerer.h"
@@ -26,7 +26,7 @@ peer_info client::registerer(register_request register_request) {
     boost::system::error_code error;
     auto serialized = register_request.serialize();
 
-    request register_request(PSH, serialized);
+    packet register_request(PSH, serialized);
     auto data = register_request.serialize();
 
     socket.send_to(boost::asio::buffer(data.first, data.second),
@@ -49,13 +49,13 @@ peer_info client::registerer(register_request register_request) {
   }
 }
 
-request client::receive_from(udp::endpoint remote_endpoint,
+packet client::receive_from(udp::endpoint remote_endpoint,
                              boost::system::error_code& error) {
   char buffer[max_length];
   auto length = socket.receive_from(boost::asio::buffer(buffer, max_length),
                                     remote_endpoint, 0, error);
 
-  request data;
+  packet data;
   data.deserialize(buffer, length);
 
   return data;

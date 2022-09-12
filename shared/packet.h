@@ -2,23 +2,23 @@
 
 #include <iostream>
 
-enum request_type { ACK = 100, PSH };
+enum packet_type { ACK = 100, PSH };
 
-struct request {
+struct packet {
   static u_short __seq_num;
 
  private:
   u_short _seq_num;
-  request_type _type;
+  packet_type _type;
   std::string _content;
 
  public:
-  request();
-  request(request_type type);
-  request(request_type type, std::string str);
+  packet();
+  packet(packet_type type);
+  packet(packet_type type, std::string str);
 
   u_short get_seq_num();
-  request_type get_type();
+  packet_type get_type();
   std::string get_content();
   u_short get_content_length();
 

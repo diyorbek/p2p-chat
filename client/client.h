@@ -3,7 +3,7 @@
 #include <boost/asio.hpp>
 #include <string>
 
-#include "../shared/request.h"
+#include "../shared/packet.h"
 #include "peer_info.h"
 #include "registerer.h"
 
@@ -23,7 +23,7 @@ class client {
   void connect(peer_info& peer);
 
  private:
-  request receive_from(udp::endpoint remote_endpoint,
+  packet receive_from(udp::endpoint remote_endpoint,
                        boost::system::error_code& error);
 
   std::string input_message();
