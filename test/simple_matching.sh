@@ -43,4 +43,5 @@ if [ "$expected" == "$actual" ]; then
   echo -e "\033[32msuccess"
 else
   echo -e "\033[31mfailed"
+  exit 1
 fi
