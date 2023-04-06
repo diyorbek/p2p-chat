@@ -50,7 +50,7 @@ peer_info client::registerer(register_request register_request) {
 }
 
 packet client::receive_from(udp::endpoint remote_endpoint,
-                             boost::system::error_code& error) {
+                            boost::system::error_code& error) {
   char buffer[max_length];
   auto length = socket.receive_from(boost::asio::buffer(buffer, max_length),
                                     remote_endpoint, 0, error);

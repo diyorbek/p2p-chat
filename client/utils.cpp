@@ -34,7 +34,7 @@ void utils::print_sent_message(std::string& message) {
 }
 
 utils::cmd_options utils::get_cmd_options(int argc, char* argv[]) {
-  cmd_options options;
+  cmd_options options{};
 
   for (int i = 1; i < argc; i++) {
     if (strcmp(argv[i], "-d") == 0) {
