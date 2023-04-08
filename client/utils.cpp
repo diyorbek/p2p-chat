@@ -37,6 +37,11 @@ utils::cmd_options utils::get_cmd_options(int argc, char* argv[]) {
   cmd_options options{};
 
   for (int i = 1; i < argc; i++) {
+    if (strcmp(argv[i], "-ui") == 0) {
+      options.is_ui_mode = true;
+      break;
+    }
+
     if (strcmp(argv[i], "-d") == 0) {
       options.is_debug_mode = true;
       continue;

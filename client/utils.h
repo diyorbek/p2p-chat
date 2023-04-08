@@ -22,6 +22,7 @@ void print_sent_message(std::string& message);
 
 struct cmd_options {
   bool is_debug_mode;
+  bool is_ui_mode;
   u_short source_port;
   bool has_known_peer;
   peer_info known_peer;
